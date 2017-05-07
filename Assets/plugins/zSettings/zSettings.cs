@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,7 +18,7 @@ public class zSettings : zNodeController
     List<SettingsElement> lastAdded;
     bool started;
     public LayoutElement headerLayoutElement;
-    public Image editFrame;
+    public Toggle autoSaveToggle;
     public static void HideTab(string tabName)
     {
         SettingsTab tab = null;
@@ -28,14 +28,12 @@ public class zSettings : zNodeController
             if (instance.activeTab == tab)
                 Debug.Log("oops, hidden active tab");
         }
-
     }
     public static void ShowTab(string tabName)
     {
         SettingsTab tab = null;
         if (instance.tabDict.TryGetValue(tabName, out tab))
             tab.Show();
-
     }
     SettingsTab AddTab(string tabName)
     {
@@ -68,7 +66,6 @@ public class zSettings : zNodeController
             settingElements[i].saveCurrent();
     }
 
-
     public void reset()
     {
         PlayerPrefs.DeleteAll();
@@ -79,7 +76,6 @@ public class zSettings : zNodeController
     {
         if (instance.canvas == null) instance.canvas = instance.GetComponent<Canvas>();
         instance.canvas.enabled = !instance.canvas.enabled;
-
     }
     public static void toggleSettings()
     {
@@ -98,7 +94,6 @@ public class zSettings : zNodeController
             saveAll();
         autoSave = b;
         Debug.Log("preferences will be saved =" + b);
-
     }
 
     float tabHeights;
@@ -117,8 +112,15 @@ public class zSettings : zNodeController
     protected override void OnValidate()
     {
         base.OnValidate();
-        //setHeight(headerHeight);
-
+        if (autoSaveToggle==null)
+        {
+            var t=transform.FindChild("SaveSettingsToggle");
+            if (t!=null)
+            {
+                autoSaveToggle=t.GetComponent<Toggle>();
+                if (autoSaveToggle==null) autoSaveToggle.isOn=autoSave;
+            }
+        }
     }
     public override void setHeight(float f)
     {
@@ -126,75 +128,45 @@ public class zSettings : zNodeController
         zNode tab = getTemplate("Tab");
         if (tab == null) return;
         RectTransform tabRecttab = tab.transform.parent.GetComponent<RectTransform>();
-
         if (tabHeights == 0) tabHeights = tabRecttab.sizeDelta.y;
         tabRecttab.sizeDelta = new Vector2(tabRecttab.sizeDelta.x, f * 1.6f); //tabHeights
         setHeaderHeight(2 * f);
     }
 
-
-    public override void highlightPanel(BaseEventData eventData)
-    {
-        if (editFrame != null) editFrame.enabled = true;
-
-    }
-    public override void restoreColor(BaseEventData eventData)
-    {
-        if (editFrame != null) editFrame.enabled = false;
-
-    }
-
-
-
     public bool IsThereASettingCalled(string paramName, string tabName)
     {
         paramName += tabName;
-
         if (elementDict == null) return false;
         return (elementDict.ContainsKey(paramName));
     }
-
 
     SettingsTab getTab(string tabName)
     {
         if (string.IsNullOrEmpty(tabName))
             Debug.LogWarning("tab name too short");
-
-
         if (tabDict == null) // do we have the dictionary?
             tabDict = new Dictionary<string, SettingsTab>();
         SettingsTab thisTab;
         if (tabDict.ContainsKey(tabName))
-        {
             tabDict.TryGetValue(tabName, out thisTab);
-        }
         else
             thisTab = AddTab(tabName);
-
         return thisTab;
     }
     public SettingsElement addSettingsElement(string nodeType, string paramName, string tabName, bool loadPref = true)
     {
         if (!started) Debug.Log(" settings not ready (how) ");
-
         SettingsElement prefab = getTemplate(nodeType) as SettingsElement;
         if (prefab == null)
             Debug.Log("unknown element " + nodeType, gameObject);
-
         SettingsElement thisSetting;
         if (elementDict.TryGetValue(tabName + paramName, out thisSetting))
-        {
-            //            Debug.Log("slider exists");
-            return thisSetting;
-        }
+               return thisSetting;
         else
         {
             SettingsTab thisTab = getTab(tabName);
-
-            //   try {
-            thisSetting = Instantiate(prefab, prefab.transform.parent);
-            //  } catch { Debug.LogError("error instantiating prefab "+prefab+" of type "+nodeType); return null;}
-            thisSetting.gameObject.SetActive(true);
+             thisSetting = Instantiate(prefab, prefab.transform.parent);
+             thisSetting.gameObject.SetActive(true);
             thisSetting.Init();
             thisSetting.setLabel(paramName);
             thisSetting.setTab(thisTab);
@@ -224,15 +196,12 @@ public class zSettings : zNodeController
     }
     public static SettingsButton addButton(string paramName, string tabName, bool loadPref = true)
     {
-
         return ((SettingsButton)instance.addSettingsElement("Button", paramName, tabName, loadPref));
     }
-
 
     protected override void Awake()
     {
         base.Awake();
-
         if (instance == null) { instance = this; }
         else { Debug.LogError("Two settings panels !", gameObject); }
         settingElements = new List<SettingsElement>();
@@ -241,8 +210,6 @@ public class zSettings : zNodeController
         started = true;
         zNode t = getTemplate("Tab");
         if (t != null) t.gameObject.SetActive(false);
-
-
         if (nodeTemplatePool[0].name.Equals("{Tab}")) Debug.LogWarning("settings should not have TABS at the first entry of the nodetemplate list!", nodeTemplatePool[0].gameObject);
 
     }
@@ -252,15 +219,10 @@ public class zSettings : zNodeController
         setScrollStateDirty();
     }
 
-
     void loadLast()
     {
         for (int i = 0; i < lastAdded.Count; i++)
-        {
             lastAdded[i].loadSaved();
-            //      Debug.Log("loading "+i);
-        }
-
         lastAdded = new List<SettingsElement>();
     }
 
