@@ -1,4 +1,4 @@
-﻿//z2k17
+﻿///zambari codes unity
 
 
 // this class is boilerplate code repository that evolved arout the concept of managing list of items (in the UI)
@@ -10,8 +10,8 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
 
-public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler//,
-                                        //    INavigateKeypad //remove keypas stuff if not needed
+public class zNodeController : MonoBehaviour
+
 {
     [SerializeField]
     public List<zNode> nodeTemplatePool;
@@ -22,33 +22,28 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
     protected List<zNode> nodes;
     protected Image image;
     protected Text text;
-    protected RectTransform content;
-    protected RectTransform contentMaskRect;
+    public RectTransform content;
+    public RectTransform contentMaskRect;
     protected GameObject templatePoolGO;
+    [SerializeField]
+    [HideInInspector]
+    protected zScrollRect scrollRect;
     protected Canvas canvas;
-    protected Scrollbar scrollBar;
-    protected float scrollAmount;
-    protected bool enableScroll;
+
     protected RectTransform rect;
     protected int activeNodeIndex;
 
     [Header(" make protected ")]
 
-    protected Vector2 startDrag;
-    protected Vector2 startSize;
+    //    protected Vector2 startDrag;
+    //  protected Vector2 startSize;
 
-    protected bool scrollStateDirty;
+    //  protected bool scrollStateDirty;
     [SerializeField]
     Dictionary<string, zNode> templateDict;
     public Action OnNodeAdded;
 
-    [HideInInspector]
-    protected bool scrollReversed
-    {
-        get { return _scrolldir; }
-        set { _scrolldir = value; }
-    }
-    bool _scrolldir;
+    //  bool _scrolldir;
     /*   get { return scrollBar.direction == Scrollbar.Direction.BottomToTop; }
        set
        {
@@ -76,7 +71,7 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         nodes[activeNodeIndex].setAsActive(true);
         scrollToActive();
-        setScrollStateDirty();
+
 
     }
     public virtual void OnDown()
@@ -92,7 +87,7 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
         } while (activeNodeIndex != startIndex && !nodes[activeNodeIndex].gameObject.activeInHierarchy);
         nodes[activeNodeIndex].setAsActive(true);
         scrollToActive();
-        setScrollStateDirty();
+
 
     }
     public virtual void GoParent()
@@ -127,11 +122,11 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public virtual void OnEnter()
     {
         if (isHidden) return;
-//        FileNode f = nodes[activeNodeIndex] as FileNode;
-    //    bool isFile = f.type == FileNode.NodeTypes.file;
-   //    nodes[activeNodeIndex].OnClick();
-    //    if (isFile)
-    //        OnLooseFocus();
+        //        FileNode f = nodes[activeNodeIndex] as FileNode;
+        //    bool isFile = f.type == FileNode.NodeTypes.file;
+        //    nodes[activeNodeIndex].OnClick();
+        //    if (isFile)
+        //        OnLooseFocus();
     }
 
     public virtual void OnEscape()
@@ -146,12 +141,7 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
         isHidden = false;
     }
     #endregion
-    public virtual void OnResizeBeginDrag(BaseEventData e)
-    {
-        startDrag = Input.mousePosition;
-        startSize = rect.sizeDelta;
-        highlightPanel(e);
-    }
+
     public zNode AddNodeFromTemplate()
     {
         return AddNode("node", nodeTemplatePool[0]);
@@ -166,7 +156,8 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
         zNode newNode = Instantiate(templateNode, content);
         newNode.setLabel(nodeName);
         newNode.gameObject.SetActive(true);
-        OnNodeAdded();
+        if (OnNodeAdded != null)
+            OnNodeAdded();
         nodes.Add(newNode);
         return newNode;
 
@@ -176,11 +167,11 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
         return AddNode(nodeName, nodeTemplatePool[0]);
     }
 
-
-    void _onNewNode()
-    {
-        scrollStateDirty = true;
-    }
+    /* 
+        void _onNewNode()
+        {
+            scrollStateDirty = true;
+        }*/
 
     public virtual void Clear()
     {
@@ -191,10 +182,10 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
             Destroy(thisNode.gameObject);
 
         }
-        setScrollStateDirty();
+
     }
 
-    bool createTemplateDictionary()
+    protected bool createTemplateDictionary()
     {
         if (nodeTemplatePool == null) Debug.Log(gameObject.name + " has no templates, trying to Add", gameObject);
         else
@@ -209,7 +200,7 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
             foreach (zNode thisNode in nodeComponents)
                 if (!String.IsNullOrEmpty(thisNode.getTemplateName()))
                     nodeTemplatePool.Add(thisNode);
-                else Debug.Log("non template node ? '" + thisNode.getTemplateName()+"'",thisNode.gameObject);
+                else Debug.Log("non template node ? '" + thisNode.getTemplateName() + "'", thisNode.gameObject);
         }
 
         templateDict = new Dictionary<string, zNode>();
@@ -236,79 +227,47 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public zNode getTemplate(string n)
     {
-     if (templateDict == null)
+        if (templateDict == null)
             createTemplateDictionary();
         zNode t;
         if (templateDict.TryGetValue(n, out t))
             return t;
         else
-           { Debug.Log(gameObject.name + " unknown template " + n + " dictionary has " + templateDict.Count + " entries", gameObject);
-           foreach(string s in templateDict.Keys) Debug.Log(s);
-    }
+        {
+            Debug.Log(gameObject.name + " unknown template " + n + " dictionary has " + templateDict.Count + " entries", gameObject);
+            foreach (string s in templateDict.Keys) Debug.Log(s);
+        }
         return t;
     }
-    public virtual void OnResizeDrag(BaseEventData e)
-    {
-        float dragged = Input.mousePosition.x - startDrag.x;
-        rect.sizeDelta = new Vector2(startSize.x + dragged, startSize.y);
-        setScrollStateDirty();
-    }
-
-    public virtual void OnResizeEndDrag(BaseEventData e)
-    {
-        restoreColor(e);
-    }
-
-    public virtual void OnResizeVertDrag(BaseEventData e)
-    {
-        float dragged = Input.mousePosition.y - startDrag.y;
-        rect.sizeDelta = new Vector2(startSize.x, startSize.y - dragged);
-    }
-
     protected virtual void scrollToActive()
     {
-        if (scrollAmount != 0 && activeNodeIndex > 0 && activeNodeIndex < nodes.Count)
-        {
-            if (nodes.Count > 1)
-            {
-                float newScroll = activeNodeIndex * 1f / (nodes.Count - 1);
-                scrollBar.value = newScroll;
-                scrollContentSlider(newScroll);
+        /*  if (scrollAmount != 0 && activeNodeIndex > 0 && activeNodeIndex < nodes.Count)
+          {
+              if (nodes.Count > 1)
+              {
+                  float newScroll = activeNodeIndex * 1f / (nodes.Count - 1);
+                  scrollBar.value = newScroll;
+                  scrollContentSlider(newScroll);
 
-            }
+              }
 
-        }
+          }*/
     }
     public virtual void newNodeHovered(zNode hoveredNode)
     {
-       /* 
-        int nodeIndex = -1;
-        for (int i = 0; i < nodes.Count; i++)
-            if (nodes[i] == hoveredNode) nodeIndex = i;
-        if (nodeIndex != -1)
-        {
-            if (activeNodeIndex >= 0 && activeNodeIndex < nodes.Count)
-                nodes[activeNodeIndex].setAsActive(false);
-            activeNodeIndex = nodeIndex;
-            nodes[activeNodeIndex].setAsActive(true);
-        }*/
-    }
-    protected virtual void scrollContentMouse(float f)
-    {
-        if (scrollBar.gameObject.activeInHierarchy)
-            if (scrollReversed) f *= -1;
-        scrollBar.value = (scrollBar.value - 200 * f / scrollAmount);
+        /* 
+         int nodeIndex = -1;
+         for (int i = 0; i < nodes.Count; i++)
+             if (nodes[i] == hoveredNode) nodeIndex = i;
+         if (nodeIndex != -1)
+         {
+             if (activeNodeIndex >= 0 && activeNodeIndex < nodes.Count)
+                 nodes[activeNodeIndex].setAsActive(false);
+             activeNodeIndex = nodeIndex;
+             nodes[activeNodeIndex].setAsActive(true);
+         }*/
     }
 
-    public virtual void scrollContentSlider(float f)
-    {
-        if (content == null) Debug.Log("no content?", gameObject);
-        else
-           if (!scrollReversed)
-            content.anchoredPosition = new Vector2(0, f * scrollAmount);
-        else
-            content.anchoredPosition = new Vector2(0, -f * scrollAmount);
-    }
     public virtual void activeNodeClicked()
     {
         if (activeNodeIndex >= 0 && activeNodeIndex < nodes.Count)
@@ -318,11 +277,6 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
 
     }
-    public void setScrollStateDirty()
-    {
-        scrollStateDirty = true;
-    }
-
     public bool activeNodePresent()
     {
         if (activeNodeIndex >= 0 && activeNodeIndex < nodes.Count && nodes[activeNodeIndex].gameObject.activeInHierarchy) return true;
@@ -333,62 +287,14 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (nodes == null) return;
         for (int i = 0; i < nodes.Count; i++)
             nodes[i].setHeight(f);
-        scrollStateDirty = true;
-    }
-    protected virtual void handleScrollStuff()
-    {
-        if (scrollBar == null) return;
-        Canvas.ForceUpdateCanvases();
-        scrollStateDirty = false;
-        bool isOne = scrollBar.value == 1;
-        //    if (isOne) Debug.Log("scrolbar is one"); else Debug.Log("scrollbar is not one");
 
-        float contentHeight = content.rect.height;
-        float maskHeight = contentMaskRect.rect.height;
-         if (contentHeight < maskHeight)
-        {
-            scrollAmount = 0;
-            scrollBar.gameObject.SetActive(false);
-        }
-        else
-        {
-            scrollBar.gameObject.SetActive(true);
-            scrollBar.size = 1 - (contentHeight - maskHeight) / maskHeight;
-            scrollAmount = (contentHeight - maskHeight);
-            if (scrollAmount == 0) scrollBar.value = 1;
-            else
-                scrollBar.value = (content.anchoredPosition.y) / scrollAmount;
-        }
-        if (isOne)
-        {
-            scrollBar.value = 1;
-            scrollContentSlider(1); // hackish
+    }
 
-        }
-    }
-    public virtual void OnPointerEnter(PointerEventData eventData)
-    {
-        enableScroll = true;
-    }
-    public virtual void OnPointerExit(PointerEventData eventData)
-    {
-        enableScroll = false;
-    }
     public virtual void NodeClicked(zNode node)
     {
 
     }
 
-    protected virtual void Update()
-    {
-        if (enableScroll)
-        {
-            float scroll = Input.GetAxis("Mouse ScrollWheel");
-            if (scroll != 0)
-                scrollContentMouse(scroll);
-        }
-        if (scrollStateDirty) handleScrollStuff();
-    }
 
     Color savedColor = new Color(0, 0, 0, 0);
     bool disableImage;
@@ -414,10 +320,14 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     protected virtual void OnValidate()
     {
-        if (scrollBar == null)
-            scrollBar = GetComponentInChildren<Scrollbar>();
+        //  if (scrollBar == null)
+        //       scrollBar = GetComponentInChildren<Scrollbar>();
         if (text == null) text = GetComponentInChildren<Text>();
-        createTemplateDictionary();
+
+        if (enabled && gameObject.activeInHierarchy)
+            createTemplateDictionary();
+        if (scrollRect == null) scrollRect = GetComponent<zScrollRect>();
+        if (scrollRect == null) gameObject.AddComponent<zScrollRect>();
     }
 
     protected virtual void Awake()
@@ -425,26 +335,26 @@ public class zNodeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
         nodes = new List<zNode>();
         image = GetComponent<Image>();
         canvas = GetComponentInParent<Canvas>();
-        scrollBar = GetComponentInChildren<Scrollbar>();
-        if (scrollBar != null)
-            scrollBar.onValueChanged.AddListener(scrollContentSlider);
+
         rect = GetComponent<RectTransform>();
-        OnNodeAdded += _onNewNode;
         createTemplateDictionary();
 
-        //if (templatePoolGO)
+        if (templatePoolGO != null)
+        {
+            GameObject contentGO = Instantiate(templatePoolGO, templatePoolGO.transform.parent);
+            content = contentGO.GetComponent<RectTransform>();
+            scrollRect.content = content;
+            for (int i = content.transform.childCount - 1; i >= 0; i--)
+                DestroyImmediate(content.transform.GetChild(i).gameObject);
+            content.name = "CONTENT";
 
-        GameObject contentGO = Instantiate(templatePoolGO, templatePoolGO.transform.parent);
-        content = contentGO.GetComponent<RectTransform>();
-        for (int i = content.transform.childCount - 1; i >= 0; i--)
-            DestroyImmediate(content.transform.GetChild(i).gameObject);
-        content.name = "CONTENT";
-      
-        Mask m = content.GetComponentInParent<Mask>();
-        if (m == null) Debug.Log("no mask");
-        else
-            contentMaskRect = m.GetComponent<RectTransform>();
-        templatePoolGO.SetActive(false);
+            Mask m = content.GetComponentInParent<Mask>();
+            if (m == null) Debug.Log("no mask");
+            else
+                contentMaskRect = m.GetComponent<RectTransform>();
+            templatePoolGO.SetActive(false);
+        }
+        else Debug.Log("no template pool");
 
     }
 

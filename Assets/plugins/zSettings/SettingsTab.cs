@@ -24,13 +24,19 @@ public class SettingsTab : SettingsElement
 
         //contentMask=tab
     }
+    void OnApplicationQuit()
+    {
+        quit=true;
+    }
+    bool quit;
+  
     public void Hide()
     {
-        if (gameObject!=null)
+if (!quit)
         gameObject.SetActive(false);
     }
     public void Show()
-    { if (gameObject!=null)
+    {// if (gameObject!=null)
         gameObject.SetActive(true);
     }
     
@@ -74,7 +80,7 @@ public class SettingsTab : SettingsElement
     public void refreshContentSize()
     {
         Canvas.ForceUpdateCanvases();
-        settingsPanel.setScrollStateDirty();
+  
     }
     public void deactivateTab()
     {

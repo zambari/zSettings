@@ -12,8 +12,8 @@ public class PosWithinRect : MonoBehaviour
     //public uiToolTip toolTip;
     [Range(0, 1)]
     public float value;
-    RectTransform sliderRect;
-    RectTransform sliderHandleRect;
+   public RectTransform sliderRect;
+   public RectTransform sliderHandleRect;
     float startPos;
 
     void checkObjectReferences()
@@ -31,7 +31,6 @@ public class PosWithinRect : MonoBehaviour
             sliderRect = slider.GetComponent<RectTransform>();
         if (sliderHandleRect == null)
             sliderHandleRect = slider.handleRect;
-
 
 
     }
@@ -59,17 +58,12 @@ public class PosWithinRect : MonoBehaviour
     public void setValue(float f)
     {
         value = f;
-
-        //if (image==null) image=GetComponent<Image>();
         image.enabled = true;
-        //if (slider != null)
         f = (f - slider.minValue) / (slider.maxValue - slider.minValue);
-if (sliderRect==null || sliderHandleRect ==null) return;
+        if (sliderRect==null || sliderHandleRect ==null) return;
         float travelDistance = sliderRect.rect.width - sliderHandleRect.rect.width + 2;
 
         if (rect == null) rect = GetComponent<RectTransform>();
-//        Debug.Log(travelDistance + "  " + f);
-        //rect.anchoredPosition = new Vector3(startPos + width * f, 0, 0);
         rect.anchoredPosition = new Vector3(startPos + travelDistance * f, 0, 0);
 
     }

@@ -19,8 +19,8 @@ public class SettingsSlider : SettingsElement
     public Action<float> valueChanged;
     float _defVal = -1000;
 
-[Range(0,1.5f)]
-public float InputFieldOffset=0.7f;
+    [Range(0, 1.5f)]
+    public float InputFieldOffset = 0.7f;
     public override void resetToDefault()
     {
         if (_defVal != -1000)
@@ -31,34 +31,34 @@ public float InputFieldOffset=0.7f;
         showValueSaved.clear();
 
     }
-    public void  InputValueChanged(string s)
+    public void InputValueChanged(string s)
     {
-        float f=Single.Parse(s);
-        slider.value=f;
+        float f = Single.Parse(s);
+        slider.value = f;
 
 
     }
     protected override void OnValidate()
     {
         base.OnValidate();
-        
-        if (slider==null) GetComponentInChildren<Slider>();
-        if (inputField==null) inputField=GetComponentInChildren<InputField>();
-        valuedDisplayTransform=inputField.GetComponent<RectTransform>();
-        if (valuedDisplayTransform!=null)
-            valuedDisplayTransform.pivot=new Vector2(-InputFieldOffset,0.5f);
-        if (showValueSaved==null) 
+
+        if (slider == null) GetComponentInChildren<Slider>();
+        if (inputField == null) inputField = GetComponentInChildren<InputField>();
+        valuedDisplayTransform = inputField.GetComponent<RectTransform>();
+        if (valuedDisplayTransform != null)
+            valuedDisplayTransform.pivot = new Vector2(-InputFieldOffset, 0.5f);
+        if (showValueSaved == null)
         {
-            Transform t=transform.Find("SavedVal");
-            if (t!=null)
-                         showValueSaved=t.GetComponent<PosWithinRect>();
-    }
-        if (showValueDefault==null) 
-        
+            Transform t = transform.Find("SavedVal");
+            if (t != null)
+                showValueSaved = t.GetComponent<PosWithinRect>();
+        }
+        if (showValueDefault == null)
+
         {
-              Transform t=transform.Find("DefValue");
-            if (t!=null)
-            showValueDefault=t.GetComponent<PosWithinRect>();
+            Transform t = transform.Find("DefValue");
+            if (t != null)
+                showValueDefault = t.GetComponent<PosWithinRect>();
         }
 
     }
@@ -70,43 +70,45 @@ public float InputFieldOffset=0.7f;
         }
         set
         {
-            if (value==true)
+            if (value == true)
             {
-                if ( slider.interactable)
+                if (slider.interactable)
                 {
-                    slider.interactable=false;
-                    Image i= slider.GetComponentInChildren<Image>();
-                    if (i!=null)
-                   i.color=i.color*0.5f;
+                    slider.interactable = false;
+                    Image i = slider.GetComponentInChildren<Image>();
+                    if (i != null)
+                        i.color = i.color * 0.5f;
                 }
 
-            } else
-        
-                if ( !slider.interactable)
-                {    slider.interactable =true;
-
-                   Image i= slider.GetComponentInChildren<Image>();
-                   if (i!=null)
-                   i.color=i.color*2f;
             }
-        
+            else
+
+                if (!slider.interactable)
+            {
+                slider.interactable = true;
+
+                Image i = slider.GetComponentInChildren<Image>();
+                if (i != null)
+                    i.color = i.color * 2f;
+            }
+
         }
     }
 
- 
+
     float halfOfRange = 0.5f;
     public float defValue
     {
         get { return _defVal; }
         set
         {
-
-               _defVal = value;
-
-            if (showValueDefault != null)
-                showValueDefault.setValue(value);
-                 this.value = value;
+            _defVal = value;
+            {
+                if (showValueDefault != null)
+                    showValueDefault.setValue(value);
+                this.value = value;
                 if (!PlayerPrefs.HasKey(getID())) saveCurrent();
+            }
 
         }
 
@@ -116,7 +118,6 @@ public float InputFieldOffset=0.7f;
         base.setLabel(s);
         gameObject.name = "Slider " + s;
 
-//        Debug.Log("name set to" + s);
     }
 
     float halfOfSliderRange()
@@ -175,22 +176,22 @@ public float InputFieldOffset=0.7f;
 
     public void sliderValueChanged(float v)
     {
-      
-    if (inputField!=null) inputField.text= (Mathf.Round(v * 100) / 100).ToString();
+
+        if (inputField != null) inputField.text = (Mathf.Round(v * 100) / 100).ToString();
 
         if (valueChanged != null)
             valueChanged.Invoke(v);
 
 
-            if (valuedDisplayTransform!=null)
+        if (valuedDisplayTransform != null)
 
             if (v < halfOfRange)
             {
-              valuedDisplayTransform.pivot=new Vector2(-InputFieldOffset,0.5f);
+                valuedDisplayTransform.pivot = new Vector2(-InputFieldOffset, 0.5f);
             }
             else
-            valuedDisplayTransform.pivot=new Vector2(1+InputFieldOffset,0.5f);
- 
+                valuedDisplayTransform.pivot = new Vector2(1 + InputFieldOffset, 0.5f);
+
         elementValueChanged();
     }
 
@@ -201,7 +202,7 @@ public float InputFieldOffset=0.7f;
             value = PlayerPrefs.GetFloat(getID());
             if (showValueSaved != null)
                 showValueSaved.setValue(value);
-            slider.value=value;
+            slider.value = value;
             sliderValueChanged(value);
         }
 

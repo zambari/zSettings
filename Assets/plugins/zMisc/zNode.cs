@@ -26,7 +26,12 @@ public class zNode : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, 
     {
     if (name.Contains("{") && name.Contains("}"))
         {
-            return name.Substring(1, name.Length - 2);
+            string templateName=(name.Substring(1, name.Length - 2));
+              char[] a = templateName.ToCharArray();
+              a[0] = char.ToUpper(a[0]);
+              templateName=new string(a);
+              gameObject.name="{"+templateName+"}";
+            return templateName;
         }
 
         return null;
@@ -59,7 +64,7 @@ public class zNode : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, 
 
 
         }*/
-
+        
     }
 
     public virtual void setColor()

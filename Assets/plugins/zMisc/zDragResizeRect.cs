@@ -113,18 +113,19 @@ public class zDragResizeRect : MonoBehaviour, IPointerEnterHandler, IPointerExit
             case Borders.L:
                 rect.anchorMin = new Vector2(0, 0);
                 rect.anchorMax = new Vector2(0, 1);
-                rect.pivot = new Vector2(1, 0);
+                
+                rect.setPivotX(1);
                 // rect. setAnchorsY(0,1);
                 break;
             case Borders.R:
                 rect.anchorMin = new Vector2(1, 0);
                 rect.anchorMax = new Vector2(1, 1);
-                rect.pivot = new Vector2(0, 0);
+                   rect.setPivotX(0);
                 break;
             case Borders.B:
                 rect.anchorMin = new Vector2(0, 0);
                 rect.anchorMax = new Vector2(1, 0);
-                rect.pivot = new Vector2(0.5f, 1);
+                     rect.setPivotY(1);
                 break;
             case Borders.BR:
                 rect.anchorMin = new Vector2(1, 0);
@@ -149,7 +150,7 @@ public class zDragResizeRect : MonoBehaviour, IPointerEnterHandler, IPointerExit
             case Borders.T:
                 rect.anchorMin = new Vector2(0, 1);
                 rect.anchorMax = new Vector2(1, 1);
-                rect.pivot = new Vector2(.5f, 0);
+                  rect.setPivotY(0);
                 //  rect.anchoredPosition = new Vector2(0, headerHeight);
                 break;
             case Borders.Drag:
@@ -276,8 +277,8 @@ public class zDragResizeRect : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if ((resizeDirection == Borders.B) ||
         (resizeDirection == Borders.BL) ||
         (resizeDirection == Borders.BR))
+            targetRect.setPivotY(1);
 
-            targetRect.setPivotX(1);
         if ((resizeDirection == Borders.T) ||
         (resizeDirection == Borders.TL) ||
         (resizeDirection == Borders.TR))
@@ -288,11 +289,12 @@ public class zDragResizeRect : MonoBehaviour, IPointerEnterHandler, IPointerExit
         (resizeDirection == Borders.TR))
 
             targetRect.setPivotX(0);
+
         if ((resizeDirection == Borders.L) ||
         (resizeDirection == Borders.TL) ||
         (resizeDirection == Borders.BL))
 
-            targetRect.setPivotY(1);
+            targetRect.setPivotX(1);
 
         startPosition = targetRect.localPosition;
 
