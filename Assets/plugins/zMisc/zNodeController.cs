@@ -22,8 +22,8 @@ public class zNodeController : MonoBehaviour
     protected List<zNode> nodes;
     protected Image image;
     protected Text text;
-    public RectTransform content;
-    public RectTransform contentMaskRect;
+    protected RectTransform content;
+    protected RectTransform contentMaskRect;
     protected GameObject templatePoolGO;
     [SerializeField]
     [HideInInspector]
@@ -216,7 +216,7 @@ public class zNodeController : MonoBehaviour
             return false;
 
         }
-        zNode t = nodeTemplatePool[0];
+        zNode t = nodeTemplatePool[nodeTemplatePool.Count-1];
         if (t.transform.parent == null) Debug.Log("no parent? wtf", gameObject);
         templatePoolGO = t.transform.parent.gameObject;
         if (templatePoolGO == null) Debug.Log(gameObject.name + " has no template pool", gameObject);
@@ -320,14 +320,21 @@ public class zNodeController : MonoBehaviour
 
     protected virtual void OnValidate()
     {
-        //  if (scrollBar == null)
-        //       scrollBar = GetComponentInChildren<Scrollbar>();
-        if (text == null) text = GetComponentInChildren<Text>();
+         if (text == null) text = GetComponentInChildren<Text>();
 
         if (enabled && gameObject.activeInHierarchy)
             createTemplateDictionary();
-        if (scrollRect == null) scrollRect = GetComponent<zScrollRect>();
-        if (scrollRect == null) gameObject.AddComponent<zScrollRect>();
+        if (scrollRect == null) 
+        {  scrollRect = GetComponent<zScrollRect>();
+            scrollRect.verticalScrollbar.direction=Scrollbar.Direction.BottomToTop;
+             scrollRect.verticalScrollbarVisibility=ScrollRect.ScrollbarVisibility.AutoHide;
+        }
+        if (scrollRect == null) 
+        {
+              gameObject.AddComponent<zScrollRect>();
+             scrollRect.verticalScrollbar.direction=Scrollbar.Direction.BottomToTop;
+             scrollRect.verticalScrollbarVisibility=ScrollRect.ScrollbarVisibility.AutoHide;
+        }
     }
 
     protected virtual void Awake()

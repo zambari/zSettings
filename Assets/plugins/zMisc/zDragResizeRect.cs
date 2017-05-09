@@ -18,9 +18,9 @@ public class zDragResizeRect : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public bool hasColorProvider;
     public float headerHeight = 20;
 
-    [SerializeField]
-    [HideInInspector]
-    protected Texture2D hoverCursor;
+   // [SerializeField]
+    //[HideInInspector]
+    public Texture2D hoverCursor;
     protected IProvideColors colorProvider;
     [SerializeField]
     [HideInInspector]
@@ -236,10 +236,11 @@ public class zDragResizeRect : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 break;
             case Borders.BL:
             case Borders.TR:
-                hoverCursor = zResourceLoader.upRightResizeCursor;
+               hoverCursor = zResourceLoader.upRightResizeCursor;
                 break;
             case Borders.TL:
             case Borders.BR:
+               
                 hoverCursor = zResourceLoader.upLeftResizeCursor;
                 break;
             case Borders.Drag:

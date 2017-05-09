@@ -44,7 +44,7 @@ public class zSettings : zNodeController
         newTabButton.transform.SetAsFirstSibling();
         SettingsTab thisTab = newTabButton.GetComponent<SettingsTab>();
         thisTab.setLabel(tabName);
-        GameObject newTabContent = Instantiate(content.gameObject, contentMaskRect);
+        GameObject newTabContent = Instantiate(content.gameObject, templatePoolGO.transform.parent);
         for (int i = newTabContent.transform.childCount - 1; i >= 0; i--)
             Destroy(newTabContent.transform.GetChild(i).gameObject); // we need to make sure new tab is empty unfortunately
         newTabContent.SetActive(true);
@@ -247,10 +247,12 @@ public class zSettings : zNodeController
            } else Debug.Log("no template pool");
 
    
-
+      
 
         checkIfAwake();
-
+        scrollRect.viewport=contentMaskRect;
+        scrollRect.verticalScrollbar.direction=Scrollbar.Direction.BottomToTop;
+        scrollRect.verticalScrollbarVisibility=ScrollRect.ScrollbarVisibility.AutoHide;
         settingElements = new List<SettingsElement>();
         elementDict = new Dictionary<string, SettingsElement>();
         lastAdded = new List<SettingsElement>();
@@ -262,6 +264,7 @@ public class zSettings : zNodeController
     public void newActiveContent(GameObject t)
     {
         content = t.GetComponent<RectTransform>();
+        scrollRect.content=content;
 //        setScrollStateDirty();
     }
 

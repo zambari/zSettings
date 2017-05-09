@@ -74,6 +74,7 @@ if (!quit)
         refreshContentSize();
         settingsPanel.activeTab = this;
         button.interactable = false;
+        
 
     }
 

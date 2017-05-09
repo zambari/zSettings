@@ -67,7 +67,7 @@ public class zResourceLoader : MonoBehaviour
         get
         {
             if (!loaded) loadResources();
-            return _upRightResizeCursor;
+            return _upLeftResizeCursor;
         }
     }
     [SerializeField]
