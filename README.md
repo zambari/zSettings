@@ -1,7 +1,7 @@
 # zSettings
 Settings module for Unity, with sliders for float values, text valeus with presets, toggles, buttons, and playerprefecnes
 
-![alt text](https://media.githubusercontent.com/media/zambari/zSettings/master/Screenshots/zSettings.png "zSettings")
+![a](Screenshots/zSettings.png "zSettings")
 
 
 To use: call static methods of zSettings from your monobehaviours to create new settings element
